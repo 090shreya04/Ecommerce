@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InfinityAdmin — Employee Management</title>
+    <meta name="description" content="Modern Employee Management System with role-based access and JWT authentication.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast" role="alert" aria-live="polite"></div>
+
+    <!-- ===== AUTH PAGES ===== -->
+    <div id="auth-container" class="auth-wrapper">
+
+        <!-- Background Orbs -->
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+
+        <!-- Theme Toggle (Auth) -->
+        <button class="theme-toggle" id="auth-theme-toggle" aria-label="Toggle theme">
+            <span class="theme-icon sun">☀️</span>
+            <span class="theme-icon moon">🌙</span>
+        </button>
+
+        <div class="auth-card glass-card">
+
+            <!-- Brand Header -->
+            <div class="auth-brand">
+                <div class="brand-logo">
+                    <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+                        <rect width="36" height="36" rx="10" fill="url(#logoGrad)"/>
+                        <path d="M10 18h16M18 10l8 8-8 8" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <defs>
+                            <linearGradient id="logoGrad" x1="0" y1="0" x2="36" y2="36">
+                                <stop offset="0%" stop-color="#3b82f6"/>
+                                <stop offset="100%" stop-color="#8b5cf6"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+                <h1>Infinity<span class="brand-accent">Admin</span></h1>
+            </div>
+
+            <!-- Tab Switcher -->
+            <div class="auth-tabs">
+                <button class="tab-btn active" id="tab-login" onclick="switchTab('login')">Sign In</button>
+                <button class="tab-btn" id="tab-register" onclick="switchTab('register')">Register</button>
+                <div class="tab-indicator" id="tab-indicator"></div>
+            </div>
+
+            <!-- LOGIN FORM -->
+            <div id="login-form-section" class="auth-section active">
+                <p class="auth-subtitle">Welcome back! Enter your credentials to continue.</p>
+                <form id="login-form" novalidate>
+                    <div class="field-group">
+                        <label for="login-username">
+                            <span class="field-icon">👤</span> Username
+                        </label>
+                        <input type="text" id="login-username" placeholder="Enter your username" autocomplete="username" required>
+                        <span class="field-error" id="login-username-err"></span>
+                    </div>
+                    <div class="field-group">
+                        <label for="login-password">
+                            <span class="field-icon">🔒</span> Password
+                        </label>
+                        <div class="password-wrap">
+                            <input type="password" id="login-password" placeholder="Enter your password" autocomplete="current-password" required>
+                            <button type="button" class="eye-toggle" onclick="togglePassword('login-password', this)">👁</button>
+                        </div>
+                        <span class="field-error" id="login-password-err"></span>
+                    </div>
+                    <button type="submit" class="btn-primary btn-full" id="login-btn">
+                        <span class="btn-text">Sign In</span>
+                        <span class="btn-loader hidden"></span>
+                    </button>
+                </form>
+                <p class="auth-hint">Demo: <strong>admin / admin123</strong> &nbsp;|&nbsp; <strong>user / user123</strong></p>
+            </div>
+
+            <!-- REGISTER FORM -->
+            <div id="register-form-section" class="auth-section">
+                <p class="auth-subtitle">Create a new account to get started.</p>
+                <form id="register-form" novalidate>
+                    <div class="field-group">
+                        <label for="reg-username">
+                            <span class="field-icon">👤</span> Username
+                        </label>
+                        <input type="text" id="reg-username" placeholder="Choose a username" autocomplete="off" required>
+                        <span class="field-error" id="reg-username-err"></span>
+                    </div>
+                    <div class="field-group">
+                        <label for="reg-password">
+                            <span class="field-icon">🔒</span> Password
+                        </label>
+                        <div class="password-wrap">
+                            <input type="password" id="reg-password" placeholder="Create a strong password" autocomplete="new-password" required>
+                            <button type="button" class="eye-toggle" onclick="togglePassword('reg-password', this)">👁</button>
+                        </div>
+                        <div class="password-strength" id="pwd-strength-bar">
+                            <div class="strength-fill" id="strength-fill"></div>
+                        </div>
+                        <span class="strength-label" id="strength-label"></span>
+                        <span class="field-error" id="reg-password-err"></span>
+                    </div>
+                    <div class="field-group">
+                        <label for="reg-confirm">
+                            <span class="field-icon">🔑</span> Confirm Password
+                        </label>
+                        <div class="password-wrap">
+                            <input type="password" id="reg-confirm" placeholder="Repeat your password" autocomplete="new-password" required>
+                            <button type="button" class="eye-toggle" onclick="togglePassword('reg-confirm', this)">👁</button>
+                        </div>
+                        <span class="field-error" id="reg-confirm-err"></span>
+                    </div>
+                    <div class="field-group">
+                        <label for="reg-role">
+                            <span class="field-icon">🛡️</span> Role
+                        </label>
+                        <div class="role-select">
+                            <button type="button" class="role-btn active" data-role="USER" onclick="selectRole(this)">
+                                <span class="role-icon">👥</span>
+                                <span class="role-name">User</span>
+                                <span class="role-desc">Read only</span>
+                            </button>
+                            <button type="button" class="role-btn" data-role="ADMIN" onclick="selectRole(this)">
+                                <span class="role-icon">⚡</span>
+                                <span class="role-name">Admin</span>
+                                <span class="role-desc">Full access</span>
+                            </button>
+                        </div>
+                        <input type="hidden" id="reg-role" value="USER">
+                    </div>
+                    <button type="submit" class="btn-primary btn-full" id="register-btn">
+                        <span class="btn-text">Create Account</span>
+                        <span class="btn-loader hidden"></span>
+                    </button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ===== DASHBOARD ===== -->
+    <div id="dashboard-container" class="hidden">
+        <!-- Mobile Overlay -->
+        <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-brand">
+                    <div class="brand-logo-sm">
+                        <svg width="28" height="28" viewBox="0 0 36 36" fill="none">
+                            <rect width="36" height="36" rx="10" fill="url(#logoGrad2)"/>
+                            <path d="M10 18h16M18 10l8 8-8 8" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            <defs>
+                                <linearGradient id="logoGrad2" x1="0" y1="0" x2="36" y2="36">
+                                    <stop offset="0%" stop-color="#3b82f6"/>
+                                    <stop offset="100%" stop-color="#8b5cf6"/>
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                    </div>
+                    <h2>Infinity<span class="brand-accent">Admin</span></h2>
+                </div>
+                <button class="sidebar-close" onclick="closeSidebar()">✕</button>
+            </div>
+
+            <nav class="nav-menu">
+                <div class="nav-section-label">MAIN MENU</div>
+                <a href="#" class="nav-link active" id="nav-dashboard" onclick="navigateTo('dashboard'); return false;">
+                    <span class="nav-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                    </span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="nav-link" id="nav-employees" onclick="navigateTo('employees'); return false;">
+                    <span class="nav-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                    </span>
+                    <span>Employees</span>
+                </a>
+            </nav>
+
+            <!-- User Profile in Sidebar -->
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="user-avatar" id="user-avatar">AD</div>
+                    <div class="user-meta">
+                        <span class="user-name" id="display-username">Admin</span>
+                        <span class="user-badge" id="display-role">ADMIN</span>
+                    </div>
+                </div>
+                <button class="btn-logout" id="logout-btn" title="Logout">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Panel -->
+        <div class="main-panel">
+            <!-- Topbar -->
+            <header class="topbar">
+                <div class="topbar-left">
+                    <button class="hamburger" id="hamburger-btn" onclick="openSidebar()">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                    </button>
+                    <div class="topbar-title">
+                        <h1 id="page-title">Employees</h1>
+                        <nav class="breadcrumb" aria-label="breadcrumb">
+                            <span>Dashboard</span> <span class="sep">›</span> <span class="active-crumb">Employees</span>
+                        </nav>
+                    </div>
+                </div>
+                <div class="topbar-right">
+                    <!-- Search -->
+                    <div class="search-bar">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        <input type="text" id="search-input" placeholder="Search employees..." aria-label="Search employees">
+                    </div>
+                    <!-- Theme Toggle -->
+                    <button class="theme-toggle-pill" id="dash-theme-toggle" aria-label="Toggle theme">
+                        <span class="pill-icon sun-pill">☀️</span>
+                        <span class="pill-knob"></span>
+                        <span class="pill-icon moon-pill">🌙</span>
+                    </button>
+                    <!-- Add Button (Admin only) -->
+                    <button class="btn-primary btn-add" id="add-employee-btn" style="display:none;" onclick="openAddModal()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        <span>Add Employee</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Stats Row -->
+            <div class="stats-grid" id="stats-grid">
+                <div class="stat-card glass-card">
+                    <div class="stat-icon stat-blue">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                    </div>
+                    <div class="stat-info">
+                        <p class="stat-label">Total Employees</p>
+                        <h3 class="stat-value" id="stat-total"><span class="skeleton-inline"></span></h3>
+                    </div>
+                    <div class="stat-sparkline stat-sparkline-blue"></div>
+                </div>
+                <div class="stat-card glass-card">
+                    <div class="stat-icon stat-purple">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+                    </div>
+                    <div class="stat-info">
+                        <p class="stat-label">Departments</p>
+                        <h3 class="stat-value" id="stat-depts"><span class="skeleton-inline"></span></h3>
+                    </div>
+                    <div class="stat-sparkline stat-sparkline-purple"></div>
+                </div>
+                <div class="stat-card glass-card">
+                    <div class="stat-icon stat-green">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                    </div>
+                    <div class="stat-info">
+                        <p class="stat-label">Avg. Salary</p>
+                        <h3 class="stat-value" id="stat-avg"><span class="skeleton-inline"></span></h3>
+                    </div>
+                    <div class="stat-sparkline stat-sparkline-green"></div>
+                </div>
+                <div class="stat-card glass-card">
+                    <div class="stat-icon stat-orange">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                    </div>
+                    <div class="stat-info">
+                        <p class="stat-label">Newest Hire</p>
+                        <h3 class="stat-value stat-value-sm" id="stat-newest"><span class="skeleton-inline"></span></h3>
+                    </div>
+                    <div class="stat-sparkline stat-sparkline-orange"></div>
+                </div>
+            </div>
+
+            <!-- Table Section -->
+            <div class="content-card glass-card fade-in">
+                <div class="table-header">
+                    <h2>Employee Directory</h2>
+                    <div class="table-actions">
+                        <select id="dept-filter" class="filter-select" onchange="filterEmployees()">
+                            <option value="">All Departments</option>
+                        </select>
+                        <button class="btn-export" onclick="exportCSV()" title="Export to CSV">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                            Export CSV
+                        </button>
+                    </div>
+                </div>
+                <div class="table-wrapper">
+                    <table id="employees-table" aria-label="Employees table">
+                        <thead>
+                            <tr>
+                                <th>Employee</th>
+                                <th>Position</th>
+                                <th class="hide-sm">Department</th>
+                                <th class="hide-md">Salary</th>
+                                <th class="hide-md">Hire Date</th>
+                                <th class="actions-th">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="employees-tbody">
+                            <tr class="skeleton-row"><td colspan="6"><div class="skeleton"></div></td></tr>
+                            <tr class="skeleton-row"><td colspan="6"><div class="skeleton"></div></td></tr>
+                            <tr class="skeleton-row"><td colspan="6"><div class="skeleton"></div></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div id="no-data" class="hidden no-data">
+                    <div class="no-data-icon">🔍</div>
+                    <h3>No employees found</h3>
+                    <p>Try a different search or add a new employee.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== EMPLOYEE MODAL ===== -->
+    <div id="employee-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <div class="modal-card glass-card">
+            <div class="modal-header">
+                <div>
+                    <h3 id="modal-title">Add Employee</h3>
+                    <p id="modal-subtitle" class="modal-subtitle">Fill in the employee details below</p>
+                </div>
+                <button class="modal-close" onclick="closeModal()" aria-label="Close modal">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+            <form id="employee-form" novalidate>
+                <input type="hidden" id="emp-id">
+                <div class="form-grid">
+                    <div class="field-group">
+                        <label for="emp-firstname">First Name</label>
+                        <input type="text" id="emp-firstname" placeholder="e.g. Rahul" required>
+                    </div>
+                    <div class="field-group">
+                        <label for="emp-lastname">Last Name</label>
+                        <input type="text" id="emp-lastname" placeholder="e.g. Sharma" required>
+                    </div>
+                    <div class="field-group full-col">
+                        <label for="emp-email">Email Address</label>
+                        <input type="email" id="emp-email" placeholder="rahul@company.com" required>
+                    </div>
+                    <div class="field-group">
+                        <label for="emp-position">Position / Title</label>
+                        <input type="text" id="emp-position" placeholder="e.g. Software Engineer" required>
+                    </div>
+                    <div class="field-group">
+                        <label for="emp-department">Department</label>
+                        <input type="text" id="emp-department" placeholder="e.g. Engineering" required>
+                    </div>
+                    <div class="field-group">
+                        <label for="emp-salary">Salary (₹)</label>
+                        <input type="number" id="emp-salary" placeholder="e.g. 75000" step="any" min="0" required>
+                    </div>
+                    <div class="field-group">
+                        <label for="emp-hiredate">Hire Date</label>
+                        <input type="date" id="emp-hiredate" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn-primary" id="save-btn">
+                        <span class="btn-text">Save Employee</span>
+                        <span class="btn-loader hidden"></span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Confirm Modal -->
+    <div id="delete-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+        <div class="confirm-card glass-card">
+            <div class="confirm-icon">🗑️</div>
+            <h3>Delete Employee?</h3>
+            <p>This action cannot be undone. Are you sure?</p>
+            <div class="confirm-actions">
+                <button class="btn-secondary" onclick="document.getElementById('delete-modal').classList.add('hidden')">Cancel</button>
+                <button class="btn-danger" id="confirm-delete-btn">Yes, Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
